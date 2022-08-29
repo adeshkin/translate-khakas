@@ -58,19 +58,20 @@ def train_epoch(model, train_dataloader, device, loss_fn, optimizer):
 def evaluate(model, val_dataloader, device, loss_fn):
     model.eval()
     losses = 0
-    for src, tgt in tqdm(val_dataloader):
-        src = src.to(device)
-        tgt = tgt.to(device)
+    with torch.no_grad():
+        for src, tgt in tqdm(val_dataloader):
+            src = src.to(device)
+            tgt = tgt.to(device)
 
-        tgt_input = tgt[:-1, :]
+            tgt_input = tgt[:-1, :]
 
-        src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input, device)
+            src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input, device)
 
-        logits = model(src, tgt_input, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask, src_padding_mask)
+            logits = model(src, tgt_input, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask, src_padding_mask)
 
-        tgt_out = tgt[1:, :]
-        loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
-        losses += loss.item()
+            tgt_out = tgt[1:, :]
+            loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
+            losses += loss.item()
 
     return losses / len(val_dataloader)
 
