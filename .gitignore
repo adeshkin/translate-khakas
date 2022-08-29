@@ -1,3 +1,8 @@
+tok_data/
+learn_bpe/
+apply_bpe_*/
+.idea/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
