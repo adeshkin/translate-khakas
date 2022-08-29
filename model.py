@@ -64,6 +64,7 @@ class Seq2SeqTransformer(nn.Module):
                  src_vocab_size: int,
                  tgt_vocab_size: int,
                  dim_feedforward: int = 512,
+                 maxlen: int = 512,
                  dropout: float = 0.1):
         super(Seq2SeqTransformer, self).__init__()
         self.transformer = Transformer(d_model=emb_size,
@@ -76,7 +77,7 @@ class Seq2SeqTransformer(nn.Module):
         self.src_tok_emb = TokenEmbedding(src_vocab_size, emb_size)
         self.tgt_tok_emb = TokenEmbedding(tgt_vocab_size, emb_size)
         self.positional_encoding = PositionalEncoding(
-            emb_size, dropout=dropout)
+            emb_size, dropout=dropout, maxlen=maxlen)
 
     def forward(self,
                 src: Tensor,

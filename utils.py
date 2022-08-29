@@ -4,7 +4,7 @@
 # source and target padding tokens. Below, let's define a function that will take care of both.
 #
 import torch
-from dataset import text_transform, vocab_transform, SRC_LANGUAGE, TGT_LANGUAGE, PAD_IDX, EOS_IDX, BOS_IDX
+from dataset import PAD_IDX, EOS_IDX, BOS_IDX
 
 
 def generate_square_subsequent_mask(sz, device):
@@ -50,7 +50,8 @@ def greedy_decode(model, src, src_mask, max_len, start_symbol, device):
 
 
 # actual function to translate input sentence into target language
-def translate(model: torch.nn.Module, src_sentence: str, device):
+def translate(model: torch.nn.Module, src_sentence: str,
+              device, SRC_LANGUAGE, TGT_LANGUAGE, text_transform, vocab_transform):
     model.eval()
     src = text_transform[SRC_LANGUAGE](src_sentence).view(-1, 1)
     num_tokens = src.shape[0]

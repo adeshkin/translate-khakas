@@ -18,30 +18,6 @@ import torch
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import DataLoader
 
-
-SRC_LANGUAGE = 'kjh'
-TGT_LANGUAGE = 'ru'
-
-# Place-holders
-token_transform = {}
-vocab_transform = {}
-
-
-def tokenize(text):
-    """
-    Tokenizes text from a string into a list of strings (tokens)
-    """
-    return text.split(' ')
-
-
-# helper function to yield list of tokens
-def yield_tokens(data_iter: Iterable, language: str) -> List[str]:
-    language_index = {SRC_LANGUAGE: 0, TGT_LANGUAGE: 1}
-
-    for data_sample in data_iter:
-        yield tokenize(data_sample[language_index[language]])
-
-
 # Define special symbols and indices
 UNK_IDX, PAD_IDX, BOS_IDX, EOS_IDX = 0, 1, 2, 3
 # Make sure the tokens are in order of their indices to properly insert them in vocab
@@ -50,14 +26,14 @@ special_symbols = ['<unk>', '<pad>', '<bos>', '<eos>']
 
 class KjhRuDataset:
     def __init__(self,
-                 data_root='/home/adeshkin/projects/nmt/translate-khakas1/data/apply_bpe_kjh_kk_ru/kjh_ru',
-                 split='test',
+                 data_root,
+                 split='train',
                  language_pair=('kjh', 'ru')):
         with open(f'{data_root}/{split}.{language_pair[0]}') as f:
-            sents1 = [x.strip() for x in f.readlines()]
+            sents1 = f.readlines()
 
         with open(f'{data_root}/{split}.{language_pair[1]}') as f:
-            sents2 = [x.strip() for x in f.readlines()]
+            sents2 = f.readlines()
 
         self.examples = [(sent1, sent2) for sent1, sent2 in zip(sents1, sents2)]
 
@@ -68,20 +44,8 @@ class KjhRuDataset:
         for x in self.examples:
             yield x
 
-
-for ln in [SRC_LANGUAGE, TGT_LANGUAGE]:
-    # Training data Iterator
-    train_iter = KjhRuDataset(split='test', language_pair=(SRC_LANGUAGE, TGT_LANGUAGE))
-    # Create torchtext's Vocab object
-    vocab_transform[ln] = build_vocab_from_iterator(yield_tokens(train_iter, ln),
-                                                    min_freq=1,
-                                                    specials=special_symbols,
-                                                    special_first=True)
-
-# Set UNK_IDX as the default index. This index is returned when the token is not found.
-# If not set, it throws RuntimeError when the queried token is not found in the Vocabulary.
-for ln in [SRC_LANGUAGE, TGT_LANGUAGE]:
-    vocab_transform[ln].set_default_index(UNK_IDX)
+    def __getitem__(self, i):
+        return self.examples[i]
 
 
 ######################################################################
@@ -101,6 +65,7 @@ def sequential_transforms(*transforms):
         for transform in transforms:
             txt_input = transform(txt_input)
         return txt_input
+
     return func
 
 
@@ -111,31 +76,91 @@ def tensor_transform(token_ids: List[int]):
                       torch.tensor([EOS_IDX])))
 
 
-# src and tgt language text transforms to convert raw strings into tensors indices
-text_transform = {}
-for ln in [SRC_LANGUAGE, TGT_LANGUAGE]:
-    text_transform[ln] = sequential_transforms(token_transform[ln],  # Tokenization
-                                               vocab_transform[ln],  # Numericalization
-                                               tensor_transform)  # Add BOS/EOS and create tensor
+def tokenize_text(text):
+    """
+    Tokenizes text from a string into a list of strings (tokens)
+    """
+    return text.split()
 
 
-# function to collate data samples into batch tesors
-def collate_fn(batch):
-    src_batch, tgt_batch = [], []
-    for src_sample, tgt_sample in batch:
-        src_batch.append(text_transform[SRC_LANGUAGE](src_sample.rstrip("\n")))
-        tgt_batch.append(text_transform[TGT_LANGUAGE](tgt_sample.rstrip("\n")))
+def prepare_comb_data(data_root_comb, language_pair_comb, min_freq):
+    SRC_LANGUAGE, TGT_LANGUAGE = language_pair_comb
 
-    src_batch = pad_sequence(src_batch, padding_value=PAD_IDX)
-    tgt_batch = pad_sequence(tgt_batch, padding_value=PAD_IDX)
-    return src_batch, tgt_batch
+    # Place-holders
+    token_transform = {}
+    vocab_transform = {}
+
+    for ln in [SRC_LANGUAGE, TGT_LANGUAGE]:
+        token_transform[ln] = tokenize_text
+
+    # helper function to yield list of tokens
+    def yield_tokens(data_iter: Iterable, language: str) -> List[str]:
+        language_index = {SRC_LANGUAGE: 0, TGT_LANGUAGE: 1}
+
+        for data_sample in data_iter:
+            yield tokenize_text(data_sample[language_index[language]])
+
+    for ln in [SRC_LANGUAGE, TGT_LANGUAGE]:
+        train_iter = KjhRuDataset(data_root_comb,
+                                  split='train',
+                                  language_pair=(SRC_LANGUAGE, TGT_LANGUAGE))
+        # Create torchtext's Vocab object
+        vocab_transform[ln] = build_vocab_from_iterator(yield_tokens(train_iter, ln),
+                                                        min_freq=min_freq,
+                                                        specials=special_symbols,
+                                                        special_first=True)
+
+    # Set UNK_IDX as the default index. This index is returned when the token is not found.
+    # If not set, it throws RuntimeError when the queried token is not found in the Vocabulary.
+    for ln in [SRC_LANGUAGE, TGT_LANGUAGE]:
+        vocab_transform[ln].set_default_index(UNK_IDX)
+
+    # src and tgt language text transforms to convert raw strings into tensors indices
+    text_transform = {}
+    for ln in [SRC_LANGUAGE, TGT_LANGUAGE]:
+        text_transform[ln] = sequential_transforms(token_transform[ln],  # Tokenization
+                                                   vocab_transform[ln],  # Numericalization
+                                                   tensor_transform)  # Add BOS/EOS and create tensor
+
+    return token_transform, vocab_transform, text_transform
 
 
-def get_dl(batch_size):
-    train_iter = Multi30k(split='train', language_pair=(SRC_LANGUAGE, TGT_LANGUAGE))
+def prepare_data(data_root_comb, language_pair_comb, data_root, language_pair, batch_size, min_freq):
+    token_transform_comb, vocab_transform_comb, text_transform_comb = prepare_comb_data(data_root_comb,
+                                                                                        language_pair_comb,
+                                                                                        min_freq)
+    comb_ln2ln = {language_pair_comb[0]: language_pair[0],
+                  language_pair_comb[1]: language_pair[1]}
+
+    token_transform = {}
+    vocab_transform = {}
+    text_transform = {}
+    for comb_ln, ln in comb_ln2ln.items():
+        token_transform[ln] = token_transform_comb[comb_ln]
+        vocab_transform[ln] = vocab_transform_comb[comb_ln]
+        text_transform[ln] = text_transform_comb[comb_ln]
+
+    SRC_LANGUAGE, TGT_LANGUAGE = language_pair
+
+    # function to collate data samples into batch tensors
+    def collate_fn(batch):
+        src_batch, tgt_batch = [], []
+        for src_sample, tgt_sample in batch:
+            src_batch.append(text_transform[SRC_LANGUAGE](src_sample.rstrip("\n")))
+            tgt_batch.append(text_transform[TGT_LANGUAGE](tgt_sample.rstrip("\n")))
+
+        src_batch = pad_sequence(src_batch, padding_value=PAD_IDX)
+        tgt_batch = pad_sequence(tgt_batch, padding_value=PAD_IDX)
+        return src_batch, tgt_batch
+
+    train_iter = KjhRuDataset(data_root,
+                              split='train',
+                              language_pair=(SRC_LANGUAGE, TGT_LANGUAGE))
     train_dataloader = DataLoader(train_iter, batch_size=batch_size, collate_fn=collate_fn)
 
-    val_iter = Multi30k(split='valid', language_pair=(SRC_LANGUAGE, TGT_LANGUAGE))
+    val_iter = KjhRuDataset(data_root,
+                            split='val',
+                            language_pair=(SRC_LANGUAGE, TGT_LANGUAGE))
     val_dataloader = DataLoader(val_iter, batch_size=batch_size, collate_fn=collate_fn)
 
-    return train_dataloader, val_dataloader
+    return train_dataloader, val_dataloader, vocab_transform, text_transform

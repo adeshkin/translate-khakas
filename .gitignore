@@ -2,6 +2,7 @@ tok_data/
 learn_bpe/
 apply_bpe_*/
 .idea/
+experiments/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
