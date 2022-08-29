@@ -6,14 +6,15 @@ source_dir=/home/adeshkin/projects/nmt/translate-khakas1/data
 num_operations=10000
 voc_thr=50
 
-sample='kjh_kk_ru'
-k_lang='kjh_kk'
+sample='kjh_ky_ru'
+k_lang='kjh_ky'
 
-sample1='kjh_ru'
-k_lang1='kjh'
+sample1='ky_ru'
+k_lang1='ky'
 
-sample2='kk_ru'
-k_lang2='kk'
+sample2='kjh_ru'
+k_lang2='kjh'
+
 
 tok_dir=$source_dir/tok_data/"$sample"
 bpe_dir=$source_dir/learn_bpe/"$sample"
@@ -29,7 +30,7 @@ subword-nmt learn-joint-bpe-and-vocab \
 
 
 tok_dir=$source_dir/tok_data/"$sample"
-bpe_result_dir=$source_dir/apply_bpe_"$k_lang"/"$sample"
+bpe_result_dir=$source_dir/apply_bpe_"$sample"/"$sample"
 mkdir -p $bpe_result_dir
 
 for lang in "$k_lang" 'ru'
@@ -44,7 +45,7 @@ done
 
 
 tok_dir=$source_dir/tok_data/"$sample1"
-bpe_result_dir=$source_dir/apply_bpe_"$k_lang"/"$sample1"
+bpe_result_dir=$source_dir/apply_bpe_"$sample"/"$sample1"
 mkdir -p $bpe_result_dir
 for lang in "$k_lang1" 'ru'
 do
@@ -63,7 +64,7 @@ done
 
 
 tok_dir=$source_dir/tok_data/"$sample2"
-bpe_result_dir=$source_dir/apply_bpe_"$k_lang"/"$sample2"
+bpe_result_dir=$source_dir/apply_bpe_"$sample"/"$sample2"
 mkdir -p $bpe_result_dir
 for lang in "$k_lang2" 'ru'
 do
