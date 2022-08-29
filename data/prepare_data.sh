@@ -6,11 +6,11 @@ source_dir=/home/adeshkin/projects/nmt/translate-khakas1/data
 num_operations=10000
 voc_thr=50
 
-sample='kjh_ky_ru'
-k_lang='kjh_ky'
+sample='kjh_source_kk_ru'
+k_lang='kjh_kk'
 
-sample1='ky_ru'
-k_lang1='ky'
+sample1='source_kk_ru'
+k_lang1='kk'
 
 sample2='kjh_ru'
 k_lang2='kjh'
