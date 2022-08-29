@@ -1,6 +1,6 @@
 
 def main():
-    data_dir = 'apply_bpe_kjh_kk/kjh_kk_ru'
+    data_dir = 'apply_bpe_kjh_source_kk_ru/kjh_source_kk_ru'
     max_len = 0
     filepath = f'{data_dir}/train.kjh_kk'
     with open(filepath) as f:
