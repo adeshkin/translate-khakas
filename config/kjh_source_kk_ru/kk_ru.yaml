@@ -13,7 +13,7 @@ min_freq: 1
 batch_size: 64
 num_epochs: 20
 early_stop_patience: 10
-device: 'cuda:1'
+device: 'cuda:0'
 
 EMB_SIZE: 512
 NHEAD: 8
