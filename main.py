@@ -120,6 +120,7 @@ def main(hparams):
 
     wandb.init(project=project_name,
                name=experiment_name,
+               config=hparams,
                dir=wandb_dir)
 
     MIN_FREQ = hparams['min_freq']
