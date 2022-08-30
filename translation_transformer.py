@@ -78,7 +78,7 @@ def evaluate(model, val_dataloader, device, loss_fn):
 
 def main():
     project_name = 'nmt'
-    experiment_name = 'default_transformer'
+    experiment_name = 'default_transformer_kjh_ru'
     save_dir = f'experiments/{project_name}/{experiment_name}'
     wandb_dir = f'{save_dir}/wandb_logs'
     os.makedirs(wandb_dir)
@@ -89,13 +89,15 @@ def main():
                name=experiment_name,
                dir=wandb_dir)
 
+    model_path = 'experiments/nmt/default_transformer/checkpoints/best.pt'
+
     SRC_DIR = '/home/adeshkin/projects/nmt/translate-khakas1/data/apply_bpe_kjh_kk_ru'
     DATA_ROOT_COMB = f'{SRC_DIR}/kjh_kk_ru'
     SRC_LANGUAGE_COMB = 'kjh_kk'
     TGT_LANGUAGE_COMB = 'ru'
 
-    DATA_ROOT = f'{SRC_DIR}/kk_ru'
-    SRC_LANGUAGE = 'kk'
+    DATA_ROOT = f'{SRC_DIR}/kjh_ru'
+    SRC_LANGUAGE = 'kjh'
     TGT_LANGUAGE = 'ru'
 
     MIN_FREQ = 1
@@ -132,11 +134,14 @@ def main():
 
     transformer = transformer.to(DEVICE)
 
+    print(f'Loading model from {model_path}...')
+    transformer.load_state_dict(torch.load(model_path))
+
     loss_fn = torch.nn.CrossEntropyLoss(ignore_index=PAD_IDX)
 
     optimizer = torch.optim.Adam(transformer.parameters(), lr=0.0001, betas=(0.9, 0.98), eps=1e-9)
 
-    NUM_EPOCHS = 20
+    NUM_EPOCHS = 50
     best_val_loss = float('inf')
 
     for epoch in range(1, NUM_EPOCHS + 1):
