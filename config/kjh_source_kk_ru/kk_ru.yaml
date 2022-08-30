@@ -7,7 +7,7 @@ tgt_language_comb: 'ru'
 src_language: 'source_kk'
 tgt_language: 'ru'
 
-num_pred_examples: 5
+num_pred_examples: 2
 
 min_freq: 1
 batch_size: 64
