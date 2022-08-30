@@ -1,7 +1,7 @@
 project_name: 'nmt'
 experiment_name: 'default_transformer'
-model_path: 'experiments/nmt/default_transformer/checkpoints/best.pt'
-data_src_dir: '/home/adeshkin/projects/nmt/translate-khakas1/data'
+model_path: null
+data_src_dir: 'data'
 src_language_comb: 'kjh_kk'
 tgt_language_comb: 'ru'
 src_language: 'kk'
@@ -11,7 +11,7 @@ num_pred_examples: 5
 
 min_freq: 1
 batch_size: 64
-num_epochs: 1
+num_epochs: 20
 early_stop_patience: 10
 device: 'cuda:1'
 
@@ -27,10 +27,10 @@ lr: 0.0001
 betas:
   - 0.9
   - 0.98
-eps: 1e-9
+eps: 1.0e-9
 factor: 0.5
 patience: 5
-min_lr: 1e-6
+min_lr: 1.0e-6
 
 
 

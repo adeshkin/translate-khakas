@@ -149,8 +149,9 @@ def main(hparams):
 
     transformer = transformer.to(DEVICE)
 
-    print(f'Loading model from {MODEL_PATH}...')
-    transformer.load_state_dict(torch.load(MODEL_PATH))
+    if MODEL_PATH and os.path.exists(MODEL_PATH):
+        print(f'Loading model from {MODEL_PATH}...')
+        transformer.load_state_dict(torch.load(MODEL_PATH))
 
     loss_fn = torch.nn.CrossEntropyLoss(ignore_index=PAD_IDX)
 
