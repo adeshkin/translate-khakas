@@ -165,6 +165,7 @@ def main(hparams):
                                                            mode='min',
                                                            factor=hparams['factor'],
                                                            patience=hparams['patience'],
+                                                           threshold=hparams['threshold'],
                                                            min_lr=hparams['min_lr'],
                                                            verbose=True)
     NUM_EPOCHS = hparams['num_epochs']

@@ -11,7 +11,7 @@ num_pred_examples: 2
 
 min_freq: 1
 batch_size: 64
-num_epochs: 50
+num_epochs: 20
 early_stop_patience: 10
 device: 'cuda:1'
 
@@ -29,6 +29,7 @@ betas:
   - 0.98
 eps: 1.0e-9
 factor: 0.5
+threshold: 0.01
 patience: 5
 min_lr: 1.0e-6
 
