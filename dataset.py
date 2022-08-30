@@ -15,6 +15,9 @@
 from torchtext.vocab import build_vocab_from_iterator
 from typing import Iterable, List
 import torch
+import os
+import numpy as np
+import random
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import DataLoader
 
@@ -125,6 +128,12 @@ def prepare_comb_data(data_root_comb, language_pair_comb, min_freq):
     return token_transform, vocab_transform, text_transform
 
 
+def seed_worker(worker_id):
+    worker_seed = torch.initial_seed() % 2 ** 32
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
+
+
 def prepare_data(data_root_comb, language_pair_comb, data_root, language_pair, batch_size, min_freq):
     token_transform_comb, vocab_transform_comb, text_transform_comb = prepare_comb_data(data_root_comb,
                                                                                         language_pair_comb,
@@ -153,14 +162,18 @@ def prepare_data(data_root_comb, language_pair_comb, data_root, language_pair, b
         tgt_batch = pad_sequence(tgt_batch, padding_value=PAD_IDX)
         return src_batch, tgt_batch
 
+    g = torch.Generator()
+    g.manual_seed(42)
+
     train_iter = KjhRuDataset(data_root,
                               split='train',
                               language_pair=(SRC_LANGUAGE, TGT_LANGUAGE))
-    train_dataloader = DataLoader(train_iter, batch_size=batch_size, collate_fn=collate_fn)
+    train_dataloader = DataLoader(train_iter, batch_size=batch_size, shuffle=True, collate_fn=collate_fn,
+                                  num_workers=os.cpu_count(), worker_init_fn=seed_worker, generator=g)
 
     val_iter = KjhRuDataset(data_root,
                             split='val',
                             language_pair=(SRC_LANGUAGE, TGT_LANGUAGE))
-    val_dataloader = DataLoader(val_iter, batch_size=batch_size, collate_fn=collate_fn)
+    val_dataloader = DataLoader(val_iter, batch_size=batch_size, shuffle=False, collate_fn=collate_fn)
 
     return train_dataloader, val_dataloader, vocab_transform, text_transform
