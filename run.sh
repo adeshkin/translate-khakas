@@ -1,6 +1,13 @@
 
-echo 'Training...'
-python main.py config/kjh_kk_ru/kk_ru.yaml
 
-echo 'Finetuning...'
-python main.py config/kjh_kk_ru/kjh_ru.yaml
+for config in config/*/??_*
+do
+  echo $config
+  python main.py $config
+done
+
+for config in config/*/???_*
+do
+  echo $config
+  python main.py $config
+done
