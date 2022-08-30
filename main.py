@@ -107,6 +107,11 @@ def main(hparams):
 
     experiment_name = f"{hparams['experiment_name']}_{SRC_LANGUAGE_COMB}_{TGT_LANGUAGE_COMB}_{SRC_LANGUAGE}_{TGT_LANGUAGE}"
 
+    SRC_LANGUAGE_COMB = SRC_LANGUAGE_COMB.replace('source_', '')
+    TGT_LANGUAGE_COMB = TGT_LANGUAGE_COMB.replace('source_', '')
+    SRC_LANGUAGE = SRC_LANGUAGE.replace('source_', '')
+    TGT_LANGUAGE = TGT_LANGUAGE.replace('source_', '')
+
     save_dir = f'experiments/{project_name}/{experiment_name}'
     wandb_dir = f'{save_dir}/wandb_logs'
     os.makedirs(wandb_dir)
@@ -208,7 +213,7 @@ def main(hparams):
         true_tgt_sents = []
         pred_tgt_sents = []
         examples = []
-        example_idxs = [random.randint(0, len(examples)-1) for _ in range(hparams['num_pred_examples'])]
+        example_idxs = [random.randint(0, len(src_sents)-1) for _ in range(hparams['num_pred_examples'])]
         for idx, (src_sent, tgt_sent) in tqdm(enumerate(zip(src_sents, tgt_sents)), total=len(src_sents), desc='TEST'):
             src_sent = src_sent.rstrip("\n")
             tgt_sent = tgt_sent.rstrip("\n")
