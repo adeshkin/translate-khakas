@@ -1,0 +1,36 @@
+project_name: 'nmt'
+experiment_name: 'default_transformer'
+model_path: 'experiments/nmt/default_transformer/checkpoints/best.pt'
+data_src_dir: '/home/adeshkin/projects/nmt/translate-khakas1/data'
+src_language_comb: 'kjh_kk'
+tgt_language_comb: 'ru'
+src_language: 'kk'
+tgt_language: 'ru'
+
+num_pred_examples: 5
+
+min_freq: 1
+batch_size: 64
+num_epochs: 1
+early_stop_patience: 10
+device: 'cuda:1'
+
+EMB_SIZE: 512
+NHEAD: 8
+FFN_HID_DIM: 512
+NUM_ENCODER_LAYERS: 3
+NUM_DECODER_LAYERS: 3
+MAXLEN: 310
+
+
+lr: 0.0001
+betas:
+  - 0.9
+  - 0.98
+eps: 1e-9
+factor: 0.5
+patience: 5
+min_lr: 1e-6
+
+
+
