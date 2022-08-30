@@ -11,7 +11,7 @@ num_pred_examples: 5
 
 min_freq: 1
 batch_size: 64
-num_epochs: 20
+num_epochs: 50
 early_stop_patience: 10
 device: 'cuda:1'
 
