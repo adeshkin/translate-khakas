@@ -9,7 +9,7 @@ tgt_language: 'kjh'
 
 num_pred_examples: 2
 
-min_freq: 2
+add_info: 'mf_2'
 batch_size: 64
 num_epochs: 100
 early_stop_patience: 10

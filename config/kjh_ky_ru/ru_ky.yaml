@@ -9,6 +9,7 @@ tgt_language: 'ky'
 
 num_pred_examples: 2
 
+add_info: 'mf_2'
 min_freq: 2
 batch_size: 64
 num_epochs: 20

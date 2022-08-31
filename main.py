@@ -106,7 +106,8 @@ def main(hparams):
     DATA_ROOT = f'{DATA_SRC_DIR}/{lang}_ru'
 
     experiment_name = f"{hparams['experiment_name']}_{SRC_LANGUAGE_COMB}_{TGT_LANGUAGE_COMB}_{SRC_LANGUAGE}_{TGT_LANGUAGE}"
-
+    if hparams['add_info']:
+        experiment_name += hparams['add_info']
     SRC_LANGUAGE_COMB = SRC_LANGUAGE_COMB.replace('source_', '')
     TGT_LANGUAGE_COMB = TGT_LANGUAGE_COMB.replace('source_', '')
     SRC_LANGUAGE = SRC_LANGUAGE.replace('source_', '')
