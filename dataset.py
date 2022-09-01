@@ -41,6 +41,7 @@ class KjhRuDataset:
 
         self.examples = [(sent1, sent2) for sent1, sent2 in zip(sents1, sents2)]
         self.length = length if length else len(self.examples)
+        print(self.length)
 
     def __len__(self):
         return self.length
