@@ -27,7 +27,6 @@ import math
 import random
 import numpy as np
 
-
 from model import Seq2SeqTransformer
 from utils import create_mask, translate
 from dataset import prepare_data, PAD_IDX
@@ -255,21 +254,23 @@ def main(hparams):
         true_tgt_sents = []
         pred_tgt_sents = []
         examples = []
-        example_idxs = [random.randint(0, len(src_sents)-1) for _ in range(hparams['num_pred_examples'])]
+        example_idxs = [random.randint(0, len(src_sents) - 1) for _ in range(hparams['num_pred_examples'])]
         for idx, (src_sent, tgt_sent) in tqdm(enumerate(zip(src_sents, tgt_sents)), total=len(src_sents), desc='TEST'):
-            src_sent = src_sent.rstrip("\n")
-            tgt_sent = tgt_sent.rstrip("\n")
-            pred_tgt_sent = translate(transformer, src_sent, DEVICE, SRC_LANGUAGE, TGT_LANGUAGE, text_transform,
-                                      vocab_transform)
+            src_sent = src_sent.strip() + ' '
+            tgt_sent = tgt_sent.strip() + ' '
+            prd_sent = translate(transformer, src_sent, DEVICE, SRC_LANGUAGE, TGT_LANGUAGE, text_transform,
+                                 vocab_transform)
+            prd_sent = prd_sent.strip() + ' '
 
-            true_tgt_sent = tgt_sent.replace('@@ ', '')
-            pred_tgt_sent = pred_tgt_sent + ' '
-            pred_tgt_sent = pred_tgt_sent.replace('@@ ', '')
+            norm_src_sent = src_sent.replace('@@ ', '')
+            norm_tgt_sent = tgt_sent.replace('@@ ', '')
 
-            pred_tgt_sents.append(pred_tgt_sent.split())
-            true_tgt_sents.append([true_tgt_sent.split()])
+            norm_prd_sent = prd_sent.replace('@@ ', '')
+
+            pred_tgt_sents.append(norm_prd_sent.split())
+            true_tgt_sents.append([norm_tgt_sent.split()])
             if idx in example_idxs:
-                examples.append((src_sent.replace('@@ ', ''), true_tgt_sent, pred_tgt_sent))
+                examples.append((norm_src_sent, norm_tgt_sent, norm_prd_sent))
 
         return bleu_score(pred_tgt_sents, true_tgt_sents), examples
 
