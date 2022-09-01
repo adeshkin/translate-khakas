@@ -93,25 +93,18 @@ def main(hparams):
     project_name = hparams['project_name']
     MODEL_PATH = hparams['model_path']
 
+    DATA_ROOT_COMB = hparams['data_root_comb']
     SRC_LANGUAGE_COMB = hparams['src_language_comb']
     TGT_LANGUAGE_COMB = hparams['tgt_language_comb']
 
-    lang = SRC_LANGUAGE_COMB if SRC_LANGUAGE_COMB != 'ru' else TGT_LANGUAGE_COMB
-    DATA_SRC_DIR = f"{hparams['data_src_dir']}/apply_bpe_{lang}_ru"
-    DATA_ROOT_COMB = f'{DATA_SRC_DIR}/{lang}_ru'
-
+    DATA_ROOT = hparams['data_root']
     SRC_LANGUAGE = hparams['src_language']
     TGT_LANGUAGE = hparams['tgt_language']
-    lang = SRC_LANGUAGE if SRC_LANGUAGE != 'ru' else TGT_LANGUAGE
-    DATA_ROOT = f'{DATA_SRC_DIR}/{lang}_ru'
 
     experiment_name = f"{hparams['experiment_name']}_{SRC_LANGUAGE_COMB}_{TGT_LANGUAGE_COMB}_{SRC_LANGUAGE}_{TGT_LANGUAGE}"
+
     if hparams['add_info']:
         experiment_name += f"_{hparams['add_info']}"
-    SRC_LANGUAGE_COMB = SRC_LANGUAGE_COMB.replace('source_', '')
-    TGT_LANGUAGE_COMB = TGT_LANGUAGE_COMB.replace('source_', '')
-    SRC_LANGUAGE = SRC_LANGUAGE.replace('source_', '')
-    TGT_LANGUAGE = TGT_LANGUAGE.replace('source_', '')
 
     save_dir = f'experiments/{project_name}/{experiment_name}'
     wandb_dir = f'{save_dir}/wandb_logs'
@@ -126,6 +119,7 @@ def main(hparams):
 
     MIN_FREQ = hparams['min_freq']
     BATCH_SIZE = hparams['batch_size']
+    NUM_STEPS = hparams['num_steps']
 
     train_dataloader, val_dataloader, vocab_transform, text_transform = prepare_data(DATA_ROOT_COMB,
                                                                                      (SRC_LANGUAGE_COMB,
@@ -133,7 +127,8 @@ def main(hparams):
                                                                                      DATA_ROOT,
                                                                                      (SRC_LANGUAGE, TGT_LANGUAGE),
                                                                                      BATCH_SIZE,
-                                                                                     MIN_FREQ)
+                                                                                     MIN_FREQ,
+                                                                                     NUM_STEPS)
 
     DEVICE = torch.device(hparams['device'])
 
@@ -170,37 +165,81 @@ def main(hparams):
                                                            threshold=hparams['threshold'],
                                                            min_lr=hparams['min_lr'],
                                                            verbose=True)
-    NUM_EPOCHS = hparams['num_epochs']
+
     best_val_loss = float('inf')
+    losses = 0
+    num_steps_no_improv = 0
+    for step, (src, tgt) in enumerate(train_dataloader):
+        src = src.to(DEVICE)
+        tgt = tgt.to(DEVICE)
 
-    num_epochs_no_improv = 0
-    for epoch in range(1, NUM_EPOCHS + 1):
-        start_time = timer()
-        train_loss = train_epoch(transformer, train_dataloader, DEVICE, loss_fn, optimizer)
-        end_time = timer()
-        val_loss = evaluate(transformer, val_dataloader, DEVICE, loss_fn)
-        scheduler.step(val_loss)
+        tgt_input = tgt[:-1, :]
 
-        wandb.log({'lr': optimizer.param_groups[0]["lr"],
-                   'train_loss': train_loss,
-                   'train_ppl': math.exp(train_loss),
-                   'val_loss': val_loss,
-                   'val_ppl': math.exp(val_loss)})
+        src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input, DEVICE)
 
-        print((f"Epoch: {epoch}, Train loss: {train_loss:.3f}, "
-               f"Val loss: {val_loss:.3f}, "f"Epoch time = {(end_time - start_time):.3f}s"))
+        logits = transformer(src, tgt_input, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask, src_padding_mask)
 
-        if val_loss < best_val_loss:
-            num_epochs_no_improv = 0
-            best_val_loss = val_loss
-            print('Saving best model...')
-            torch.save(transformer.state_dict(), f"{checkpoint_dir}/best.pt")
-        else:
-            num_epochs_no_improv += 1
+        optimizer.zero_grad()
 
-        if num_epochs_no_improv == hparams['early_stop_patience']:
-            print('Early stopping...')
-            break
+        tgt_out = tgt[1:, :]
+        loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
+        loss.backward()
+
+        optimizer.step()
+        losses += loss.item()
+        if step % hparams['check_val_every_n_steps'] == 0 and step != 0:
+            train_loss = losses / hparams['check_val_every_n_steps']
+            losses = 0
+
+            val_loss = evaluate(transformer, val_dataloader, DEVICE, loss_fn)
+            scheduler.step(val_loss)
+
+            wandb.log({'lr': optimizer.param_groups[0]["lr"],
+                       'train_loss': train_loss,
+                       'train_ppl': math.exp(train_loss),
+                       'val_loss': val_loss,
+                       'val_ppl': math.exp(val_loss)})
+
+            print(f"Step: {step}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}")
+
+            if val_loss < best_val_loss:
+                num_steps_no_improv = 0
+                best_val_loss = val_loss
+                print('Saving best model...')
+                torch.save(transformer.state_dict(), f"{checkpoint_dir}/best.pt")
+            else:
+                num_steps_no_improv += 1
+
+            if num_steps_no_improv == hparams['early_stop_patience']:
+                print('Early stopping...')
+                break
+
+    # NUM_EPOCHS = hparams['num_epochs']
+    # num_epochs_no_improv = 0
+    # for epoch in range(1, NUM_EPOCHS + 1):
+    #     train_loss = train_epoch(transformer, train_dataloader, DEVICE, loss_fn, optimizer)
+    #     val_loss = evaluate(transformer, val_dataloader, DEVICE, loss_fn)
+    #     scheduler.step(val_loss)
+    #
+    #     wandb.log({'lr': optimizer.param_groups[0]["lr"],
+    #                'train_loss': train_loss,
+    #                'train_ppl': math.exp(train_loss),
+    #                'val_loss': val_loss,
+    #                'val_ppl': math.exp(val_loss)})
+    #
+    #     print(f"Epoch: {epoch}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}")
+    #
+    #     if val_loss < best_val_loss:
+    #         num_epochs_no_improv = 0
+    #         best_val_loss = val_loss
+    #         print('Saving best model...')
+    #         torch.save(transformer.state_dict(), f"{checkpoint_dir}/best.pt")
+    #     else:
+    #         num_epochs_no_improv += 1
+    #
+    #     if num_epochs_no_improv == hparams['early_stop_patience']:
+    #         print('Early stopping...')
+    #         break
 
     def calc_bleu(split='test'):
         src_filepath = f'{DATA_ROOT}/{split}.{SRC_LANGUAGE}'

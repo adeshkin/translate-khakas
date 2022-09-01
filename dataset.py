@@ -31,7 +31,8 @@ class KjhRuDataset:
     def __init__(self,
                  data_root,
                  split='train',
-                 language_pair=('kjh', 'ru')):
+                 language_pair=('kjh', 'ru'),
+                 length=None):
         with open(f'{data_root}/{split}.{language_pair[0]}') as f:
             sents1 = f.readlines()
 
@@ -39,15 +40,18 @@ class KjhRuDataset:
             sents2 = f.readlines()
 
         self.examples = [(sent1, sent2) for sent1, sent2 in zip(sents1, sents2)]
+        self.length = length if length else len(self.examples)
 
     def __len__(self):
-        return len(self.examples)
+        return self.length
 
     def __iter__(self):
         for x in self.examples:
             yield x
 
     def __getitem__(self, i):
+        i = i % len(self.examples)
+
         return self.examples[i]
 
 
@@ -134,7 +138,7 @@ def seed_worker(worker_id):
     random.seed(worker_seed)
 
 
-def prepare_data(data_root_comb, language_pair_comb, data_root, language_pair, batch_size, min_freq):
+def prepare_data(data_root_comb, language_pair_comb, data_root, language_pair, batch_size, min_freq, num_steps=None):
     token_transform_comb, vocab_transform_comb, text_transform_comb = prepare_comb_data(data_root_comb,
                                                                                         language_pair_comb,
                                                                                         min_freq)
@@ -155,8 +159,8 @@ def prepare_data(data_root_comb, language_pair_comb, data_root, language_pair, b
     def collate_fn(batch):
         src_batch, tgt_batch = [], []
         for src_sample, tgt_sample in batch:
-            src_batch.append(text_transform[SRC_LANGUAGE](src_sample.rstrip("\n")))
-            tgt_batch.append(text_transform[TGT_LANGUAGE](tgt_sample.rstrip("\n")))
+            src_batch.append(text_transform[SRC_LANGUAGE](src_sample.strip()))
+            tgt_batch.append(text_transform[TGT_LANGUAGE](tgt_sample.strip()))
 
         src_batch = pad_sequence(src_batch, padding_value=PAD_IDX)
         tgt_batch = pad_sequence(tgt_batch, padding_value=PAD_IDX)
@@ -167,7 +171,8 @@ def prepare_data(data_root_comb, language_pair_comb, data_root, language_pair, b
 
     train_iter = KjhRuDataset(data_root,
                               split='train',
-                              language_pair=(SRC_LANGUAGE, TGT_LANGUAGE))
+                              language_pair=(SRC_LANGUAGE, TGT_LANGUAGE),
+                              length=num_steps)
     train_dataloader = DataLoader(train_iter, batch_size=batch_size, shuffle=True, collate_fn=collate_fn,
                                   num_workers=os.cpu_count(), worker_init_fn=seed_worker, generator=g)
 

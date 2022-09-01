@@ -1,8 +1,8 @@
 
 def main():
-    data_dir = 'apply_bpe_kjh_source_kk_ru/kjh_source_kk_ru'
+    data_dir = 'apply_bpe_kjh_til_kk_ky_ru/kjh_ru'
     max_len = 0
-    filepath = f'{data_dir}/train.kjh_kk'
+    filepath = f'{data_dir}/train.kjh'
     with open(filepath) as f:
         sents = f.readlines()
 

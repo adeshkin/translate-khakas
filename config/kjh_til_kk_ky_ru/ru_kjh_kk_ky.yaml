@@ -1,0 +1,41 @@
+project_name: 'nmt'
+experiment_name: 'default_transformer'
+model_path: null
+
+data_root_comb: 'data/apply_bpe_kjh_til_kk_ky_ru/kjh_til_kk_ky_ru'
+src_language_comb: 'ru'
+tgt_language_comb: 'kjh_kk_ky'
+
+data_root: 'data/apply_bpe_kjh_til_kk_ky_ru/kjh_til_kk_ky_ru'
+src_language: 'ru'
+tgt_language: 'kjh_kk_ky'
+
+num_pred_examples: 3
+
+add_info: ''
+min_freq: 1
+batch_size: 32
+num_steps: 500000
+early_stop_patience: 10000
+device: 'cuda:1'
+
+EMB_SIZE: 256
+NHEAD: 8
+FFN_HID_DIM: 256
+NUM_ENCODER_LAYERS: 3
+NUM_DECODER_LAYERS: 3
+MAXLEN: 1000
+
+
+lr: 0.0001
+betas:
+  - 0.9
+  - 0.98
+eps: 1.0e-9
+factor: 0.5
+threshold: 0.01
+patience: 5
+min_lr: 1.0e-6
+
+
+
