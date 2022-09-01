@@ -6,10 +6,10 @@ source_dir=/home/adeshkin/projects/nmt/translate-khakas1/data
 num_operations=10000
 voc_thr=50
 
-sample='kjh_source_kk_ru'
+sample='kjh_kk_ru'
 k_lang='kjh_kk'
 
-sample1='source_kk_ru'
+sample1='kk_ru'
 k_lang1='kk'
 
 sample2='kjh_ru'
@@ -35,12 +35,13 @@ mkdir -p $bpe_result_dir
 
 for lang in "$k_lang" 'ru'
 do
-  mode='train'
-  echo "apply_bpe.py to : ${lang}.${mode}..."
-  subword-nmt apply-bpe -c $bpe_dir/bpe.codes \
-      --vocabulary $bpe_dir/bpe.vocab.$lang\
-      --vocabulary-threshold $voc_thr < $tok_dir/$mode.$lang > $bpe_result_dir/$mode.$lang
-
+  for mode in 'train' 'val' 'test'
+  do
+    echo "apply_bpe.py to : ${lang}.${mode}..."
+    subword-nmt apply-bpe -c $bpe_dir/bpe.codes \
+        --vocabulary $bpe_dir/bpe.vocab.$lang\
+        --vocabulary-threshold $voc_thr < $tok_dir/$mode.$lang > $bpe_result_dir/$mode.$lang
+  done
 done
 
 
