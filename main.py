@@ -168,6 +168,7 @@ def main(hparams):
     best_val_loss = float('inf')
     losses = 0
     num_steps_no_improv = 0
+    transformer.train()
     for step, (src, tgt) in enumerate(train_dataloader):
         src = src.to(DEVICE)
         tgt = tgt.to(DEVICE)
@@ -212,7 +213,7 @@ def main(hparams):
             if num_steps_no_improv == hparams['early_stop_patience']:
                 print('Early stopping...')
                 break
-
+            transformer.train()
     # NUM_EPOCHS = hparams['num_epochs']
     # num_epochs_no_improv = 0
     # for epoch in range(1, NUM_EPOCHS + 1):
