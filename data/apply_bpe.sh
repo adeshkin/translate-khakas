@@ -9,8 +9,8 @@ sample='kjh_til_kk_ky_ru'
 src_lang='kjh_kk_ky'
 tgt_lang='ru'
 
-sample1='til_ky_ru'
-src_lang1='ky'
+sample1='til_kk_ru'
+src_lang1='kk'
 tgt_lang1='ru'
 
 bpe_dir=$source_dir/learn_bpe/"$sample"
