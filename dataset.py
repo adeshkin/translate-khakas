@@ -159,8 +159,8 @@ def prepare_data(data_root_comb, language_pair_comb, data_root, language_pair, b
     def collate_fn(batch):
         src_batch, tgt_batch = [], []
         for src_sample, tgt_sample in batch:
-            src_batch.append(text_transform[SRC_LANGUAGE](src_sample.strip()))
-            tgt_batch.append(text_transform[TGT_LANGUAGE](tgt_sample.strip()))
+            src_batch.append(text_transform[SRC_LANGUAGE](src_sample.rstrip('\n')))
+            tgt_batch.append(text_transform[TGT_LANGUAGE](tgt_sample.rstrip('\n')))
 
         src_batch = pad_sequence(src_batch, padding_value=PAD_IDX)
         tgt_batch = pad_sequence(tgt_batch, padding_value=PAD_IDX)
