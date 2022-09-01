@@ -19,7 +19,7 @@ def main():
     random.seed(42)
     data_dir = 'til_data'
 
-    src_lang = 'kk'
+    src_lang = 'tr'
     tgt_lang = 'ru'
 
     tokenizer = WordPunctTokenizer()
