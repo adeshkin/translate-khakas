@@ -9,16 +9,16 @@ tgt_language: 'ky'
 
 num_pred_examples: 2
 
-add_info: 'mf_2'
-min_freq: 2
+add_info: '256_256'
+min_freq: 1
 batch_size: 64
 num_epochs: 20
 early_stop_patience: 10
 device: 'cuda:1'
 
-EMB_SIZE: 512
+EMB_SIZE: 256
 NHEAD: 8
-FFN_HID_DIM: 512
+FFN_HID_DIM: 256
 NUM_ENCODER_LAYERS: 3
 NUM_DECODER_LAYERS: 3
 MAXLEN: 310
