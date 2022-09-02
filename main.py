@@ -187,8 +187,8 @@ def main(hparams):
 
         if step % int(hparams['check_val_every_n_steps'] / 10) == 0:
             os.system('clear')
-            percentage = int((step/hparams['check_val_every_n_steps']) * 100)
-            print('#' * percentage, f'{percentage} %')
+            percentage = int((step % hparams['check_val_every_n_steps']) * 100)
+            print(f'Step: {step}, Train:', '#' * percentage, f'{percentage} %')
 
         if step % hparams['num_accumulation_steps'] == 0:
             optimizer.step()
@@ -206,7 +206,6 @@ def main(hparams):
                        'train_ppl': math.exp(train_loss),
                        'val_loss': val_loss,
                        'val_ppl': math.exp(val_loss)})
-            os.system('clear')
             print(f"Step: {step}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}")
 
             if val_loss < best_val_loss:
