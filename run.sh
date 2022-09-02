@@ -12,4 +12,8 @@ do
   python main.py $config
 done
 
-
+for config in config/kjh_wmt19_kk_til_ky_ru/???/*
+do
+  echo $config
+  python main.py $config
+done
