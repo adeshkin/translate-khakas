@@ -17,7 +17,7 @@ add_info: ''
 min_freq: 1
 batch_size: 24
 num_accumulation_steps: 32
-num_steps: 3000000
+num_steps: 6000000
 early_stop_patience: 30
 check_val_every_n_steps: 10000
 
