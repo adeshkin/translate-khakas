@@ -39,37 +39,11 @@ def set_seed(seed):
     torch.backends.cudnn.deterministic = True
 
 
-def train_epoch(model, train_dataloader, device, loss_fn, optimizer):
-    model.train()
-    losses = 0
-
-    for src, tgt in tqdm(train_dataloader, desc='TRAIN'):
-        src = src.to(device)
-        tgt = tgt.to(device)
-
-        tgt_input = tgt[:-1, :]
-
-        src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input, device)
-
-        logits = model(src, tgt_input, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask, src_padding_mask)
-
-        optimizer.zero_grad()
-
-        tgt_out = tgt[1:, :]
-        loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
-        loss.backward()
-
-        optimizer.step()
-        losses += loss.item()
-
-    return losses / len(train_dataloader)
-
-
 def evaluate(model, val_dataloader, device, loss_fn):
     model.eval()
     losses = 0
     with torch.no_grad():
-        for src, tgt in tqdm(val_dataloader, desc='EVALUATE'):
+        for src, tgt in tqdm(val_dataloader, desc='EVALUATION'):
             src = src.to(device)
             tgt = tgt.to(device)
 
@@ -87,7 +61,7 @@ def evaluate(model, val_dataloader, device, loss_fn):
 
 
 def main(hparams):
-    set_seed(42)
+    set_seed(1234567890)
     project_name = hparams['project_name']
     MODEL_PATH = hparams['model_path']
 
@@ -231,8 +205,8 @@ def main(hparams):
 
                 transformer.train()
     except KeyboardInterrupt:
-        print('Manual stop...')
-        print(f"\nBest Val loss: {best_val_loss:.3f}")
+        print('\nManual stop...')
+        print(f"Best Val loss: {best_val_loss:.3f}")
 
     def calc_bleu(split='test'):
         src_filepath = f'{DATA_ROOT}/{split}.{SRC_LANGUAGE}'
