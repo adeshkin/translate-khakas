@@ -1,6 +1,6 @@
 project_name: 'nmt_wmt19_kk_til_ky'
 experiment_name: 'default_transformer'
-model_path: 'experiments/nmt_wmt19_kk_til_ky/default_transformer_ru_kjh_kk_ky_ru_kk/checkpoints/best.pt'
+model_path: 'experiments/nmt_wmt19_kk_til_ky/default_transformer_lang_comb_ru_kjh_kk_ky_lang_ru_ky/checkpoints/best.pt'
 
 data_root_comb: 'data/apply_bpe_kjh_wmt19_kk_til_ky_ru/kjh_wmt19_kk_til_ky_ru'
 src_language_comb: 'ru'
@@ -12,13 +12,13 @@ tgt_language: 'kjh'
 
 num_pred_examples: 3
 
-add_info: ''
+add_info: 'ru_ky'
 min_freq: 1
 batch_size: 24
 num_accumulation_steps: 32
 num_steps: 500000
 early_stop_patience: 15
-check_val_every_n_steps: 1000
+check_val_every_n_steps: 10000
 
 device: 'cuda:1'
 
