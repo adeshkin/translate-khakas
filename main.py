@@ -145,68 +145,68 @@ def main(hparams):
     num_steps_no_improv = 0
     transformer.train()
     optimizer.zero_grad()
-    try:
-        print('Training...')
-        for step, (src, tgt) in enumerate(train_dataloader, start=1):
-            src = src.to(DEVICE)
-            tgt = tgt.to(DEVICE)
+    # try:
+    print('Training...')
+    for step, (src, tgt) in enumerate(train_dataloader, start=1):
+        src = src.to(DEVICE)
+        tgt = tgt.to(DEVICE)
 
-            tgt_input = tgt[:-1, :]
+        tgt_input = tgt[:-1, :]
 
-            src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input, DEVICE)
+        src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input, DEVICE)
 
-            logits = transformer(src, tgt_input, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask, src_padding_mask)
+        logits = transformer(src, tgt_input, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask, src_padding_mask)
 
-            tgt_out = tgt[1:, :]
-            loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
-            loss.backward()
-            losses += loss.item()
+        tgt_out = tgt[1:, :]
+        loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
+        loss.backward()
+        losses += loss.item()
 
-            if step % int(hparams['check_val_every_n_steps'] / 10) == 0:
-                os.system('clear')
-
-                if step % hparams['check_val_every_n_steps'] == 0:
-                    percentage = 100
-                else:
-                    percentage = int(((step % hparams['check_val_every_n_steps']) / hparams['check_val_every_n_steps']) * 100)
-
-                print(f'Step: {step}, Train:', '#' * percentage, f'{percentage} %')
-
-            if step % hparams['num_accumulation_steps'] == 0:
-                optimizer.step()
-                optimizer.zero_grad()
+        if step % int(hparams['check_val_every_n_steps'] / 10) == 0:
+            os.system('clear')
 
             if step % hparams['check_val_every_n_steps'] == 0:
-                train_loss = losses / hparams['check_val_every_n_steps']
-                losses = 0
+                percentage = 100
+            else:
+                percentage = int(((step % hparams['check_val_every_n_steps']) / hparams['check_val_every_n_steps']) * 100)
 
-                val_loss = evaluate(transformer, val_dataloader, DEVICE, loss_fn)
+            print(f'Step: {step}, Train:', '#' * percentage, f'{percentage} %')
 
-                scheduler.step(val_loss)
+        if step % hparams['num_accumulation_steps'] == 0:
+            optimizer.step()
+            optimizer.zero_grad()
 
-                wandb.log({'lr': optimizer.param_groups[0]["lr"],
-                           'train_loss': train_loss,
-                           'train_ppl': math.exp(train_loss),
-                           'val_loss': val_loss,
-                           'val_ppl': math.exp(val_loss)})
-                print(f"Step: {step}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}")
+        if step % hparams['check_val_every_n_steps'] == 0:
+            train_loss = losses / hparams['check_val_every_n_steps']
+            losses = 0
 
-                if val_loss < best_val_loss:
-                    num_steps_no_improv = 0
-                    best_val_loss = val_loss
-                    print('Saving best model...')
-                    torch.save(transformer.state_dict(), f"{checkpoint_dir}/best.pt")
-                else:
-                    num_steps_no_improv += 1
+            val_loss = evaluate(transformer, val_dataloader, DEVICE, loss_fn)
 
-                if num_steps_no_improv == hparams['early_stop_patience']:
-                    print('Early stopping...')
-                    break
+            scheduler.step(val_loss)
 
-                transformer.train()
-    except KeyboardInterrupt:
-        print('\nManual stop...')
-        print(f"Best Val loss: {best_val_loss:.3f}")
+            wandb.log({'lr': optimizer.param_groups[0]["lr"],
+                       'train_loss': train_loss,
+                       'train_ppl': math.exp(train_loss),
+                       'val_loss': val_loss,
+                       'val_ppl': math.exp(val_loss)})
+            print(f"Step: {step}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}")
+
+            if val_loss < best_val_loss:
+                num_steps_no_improv = 0
+                best_val_loss = val_loss
+                print('Saving best model...')
+                torch.save(transformer.state_dict(), f"{checkpoint_dir}/best.pt")
+            else:
+                num_steps_no_improv += 1
+
+            if num_steps_no_improv == hparams['early_stop_patience']:
+                print('Early stopping...')
+                break
+
+            transformer.train()
+    # except KeyboardInterrupt:
+    #     print('\nManual stop...')
+    #     print(f"Best Val loss: {best_val_loss:.3f}")
 
     def calc_bleu(split='test'):
         src_filepath = f'{DATA_ROOT}/{split}.{SRC_LANGUAGE}'
