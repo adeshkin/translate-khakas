@@ -99,7 +99,7 @@ def main(hparams):
     SRC_LANGUAGE = hparams['src_language']
     TGT_LANGUAGE = hparams['tgt_language']
 
-    experiment_name = f"{hparams['experiment_name']}_{SRC_LANGUAGE_COMB}_{TGT_LANGUAGE_COMB}_{SRC_LANGUAGE}_{TGT_LANGUAGE}"
+    experiment_name = f"{hparams['experiment_name']}_lang_comb_{SRC_LANGUAGE_COMB}_{TGT_LANGUAGE_COMB}_lang_{SRC_LANGUAGE}_{TGT_LANGUAGE}"
 
     if hparams['add_info']:
         experiment_name += f"_{hparams['add_info']}"
@@ -203,7 +203,12 @@ def main(hparams):
             train_loss = losses / hparams['check_val_every_n_steps']
             losses = 0
 
-            val_loss = evaluate(transformer, val_dataloader, DEVICE, loss_fn)
+            try:
+                val_loss = evaluate(transformer, val_dataloader, DEVICE, loss_fn)
+            except KeyboardInterrupt:
+                print('Manual stop...')
+                break
+
             scheduler.step(val_loss)
 
             wandb.log({'lr': optimizer.param_groups[0]["lr"],
@@ -226,33 +231,6 @@ def main(hparams):
                 break
 
             transformer.train()
-
-    # NUM_EPOCHS = hparams['num_epochs']
-    # num_epochs_no_improv = 0
-    # for epoch in range(1, NUM_EPOCHS + 1):
-    #     train_loss = train_epoch(transformer, train_dataloader, DEVICE, loss_fn, optimizer)
-    #     val_loss = evaluate(transformer, val_dataloader, DEVICE, loss_fn)
-    #     scheduler.step(val_loss)
-    #
-    #     wandb.log({'lr': optimizer.param_groups[0]["lr"],
-    #                'train_loss': train_loss,
-    #                'train_ppl': math.exp(train_loss),
-    #                'val_loss': val_loss,
-    #                'val_ppl': math.exp(val_loss)})
-    #
-    #     print(f"Epoch: {epoch}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}")
-    #
-    #     if val_loss < best_val_loss:
-    #         num_epochs_no_improv = 0
-    #         best_val_loss = val_loss
-    #         print('Saving best model...')
-    #         torch.save(transformer.state_dict(), f"{checkpoint_dir}/best.pt")
-    #     else:
-    #         num_epochs_no_improv += 1
-    #
-    #     if num_epochs_no_improv == hparams['early_stop_patience']:
-    #         print('Early stopping...')
-    #         break
 
     def calc_bleu(split='test'):
         src_filepath = f'{DATA_ROOT}/{split}.{SRC_LANGUAGE}'

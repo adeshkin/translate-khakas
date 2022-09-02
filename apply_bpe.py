@@ -223,7 +223,7 @@ def read_vocabulary(vocab_file, threshold):
     for line in vocab_file:
         word, freq = line.strip('\r\n ').split(' ')
         freq = int(freq)
-        if threshold == None or freq >= threshold:
+        if threshold is None or freq >= threshold:
             vocabulary.add(word)
 
     return vocabulary
@@ -248,25 +248,12 @@ def isolate_glossary(word, glossary):
         return segments + [ending.strip('\r\n ')] if ending != '' else segments
 
 
-def init_bpe(hparams):
-    codes_path = f"{hparams['bpe_dir']}/bpe_kjh.codes"
-    vocabulary_path = f"{hparams['bpe_dir']}/bpe.vocab.kk_kjh"
+def init_bpe(bpe_dir, lang, vocabulary_threshold):
+    codes_path = f'{bpe_dir}/bpe.codes'
+    vocabulary_path = f'{bpe_dir}/bpe.vocab.{lang}'
     codes = codecs.open(codes_path, encoding='utf-8')
     vocabulary_f = codecs.open(vocabulary_path, encoding='utf-8')
-    vocabulary = read_vocabulary(vocabulary_f, hparams['vocabulary_threshold'])
-    kjh_bpe = BPE(codes, vocab=vocabulary)
+    vocabulary = read_vocabulary(vocabulary_f, vocabulary_threshold)
+    bpe = BPE(codes, vocab=vocabulary)
 
-    codes_path = f"{hparams['bpe_dir']}/bpe_ru.codes"
-    vocabulary_path = f"{hparams['bpe_dir']}/bpe.vocab.ru"
-    codes1 = codecs.open(codes_path, encoding='utf-8')
-    vocabulary_f1 = codecs.open(vocabulary_path, encoding='utf-8')
-    vocabulary1 = read_vocabulary(vocabulary_f1, hparams['vocabulary_threshold'])
-    ru_bpe = BPE(codes1, vocab=vocabulary1)
-
-    bpe = {'kh': kjh_bpe,
-           'ru': ru_bpe}
     return bpe
-
-
-
-
