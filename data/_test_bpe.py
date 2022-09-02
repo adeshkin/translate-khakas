@@ -1,7 +1,7 @@
 from nltk.tokenize import WordPunctTokenizer
 import torch
 
-from dataset import prepare_comb_data, UNK_IDX, sequential_transforms, tensor_transform, tokenize_text
+from dataset import UNK_IDX, sequential_transforms, tensor_transform, tokenize_text
 from apply_bpe import init_bpe
 
 bpe_dir = 'data/learn_bpe/kjh_wmt19_kk_til_ky_ru'
