@@ -1,22 +1,25 @@
 
 def main():
-    data_dir = 'apply_bpe_kjh_til_kk_ky_ru/kjh_til_kk_ky_ru'
+    data_dir = 'apply_bpe_kjh_wmt19_kk_til_ky_ru/kjh_wmt19_kk_til_ky_ru'
     max_len = 0
-    filepath = f'{data_dir}/train.ru'
-    with open(filepath) as f:
-        sents = f.readlines()
+    src_lang = 'kjh_kk_ky'
+    tgt_lang = 'ru'
+    for split in ['train', 'val', 'test']:
+        filepath = f'{data_dir}/{split}.{src_lang}'
+        with open(filepath) as f:
+            sents = f.readlines()
 
-    for sent in sents:
-        if len(sent.split(' ')) > max_len:
-            max_len = len(sent.split(' '))
+        for sent in sents:
+            if len(sent.split(' ')) > max_len:
+                max_len = len(sent.split())
 
-    filepath = f'{data_dir}/train.ru'
-    with open(filepath) as f:
-        sents = f.readlines()
+        filepath = f'{data_dir}/{split}.{tgt_lang}'
+        with open(filepath) as f:
+            sents = f.readlines()
 
-    for sent in sents:
-        if len(sent.split(' ')) > max_len:
-            max_len = len(sent.split(' '))
+        for sent in sents:
+            if len(sent.split(' ')) > max_len:
+                max_len = len(sent.split())
 
     print(max_len)
 

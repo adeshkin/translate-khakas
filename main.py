@@ -168,7 +168,9 @@ def main(hparams):
     losses = 0
     num_steps_no_improv = 0
     transformer.train()
-    for step, (src, tgt) in enumerate(train_dataloader):
+    optimizer.zero_grad()
+
+    for step, (src, tgt) in enumerate(train_dataloader, start=1):
         src = src.to(DEVICE)
         tgt = tgt.to(DEVICE)
 
@@ -178,15 +180,21 @@ def main(hparams):
 
         logits = transformer(src, tgt_input, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask, src_padding_mask)
 
-        optimizer.zero_grad()
-
         tgt_out = tgt[1:, :]
         loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
         loss.backward()
-
-        optimizer.step()
         losses += loss.item()
-        if step % hparams['check_val_every_n_steps'] == 0 and step != 0:
+
+        if step % int(hparams['check_val_every_n_epoch'] / 10) == 0:
+            os.system('cls')
+            percentage = int((step/hparams['check_val_every_n_epoch']) * 100)
+            print('#' * percentage, f'{percentage} %')
+
+        if step % hparams['num_accumulation_steps'] == 0:
+            optimizer.step()
+            optimizer.zero_grad()
+
+        if step % hparams['check_val_every_n_epoch'] == 0:
             train_loss = losses / hparams['check_val_every_n_steps']
             losses = 0
 
@@ -198,7 +206,7 @@ def main(hparams):
                        'train_ppl': math.exp(train_loss),
                        'val_loss': val_loss,
                        'val_ppl': math.exp(val_loss)})
-
+            os.system('cls')
             print(f"Step: {step}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}")
 
             if val_loss < best_val_loss:
