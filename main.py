@@ -171,8 +171,8 @@ def main(hparams):
     num_steps_no_improv = 0
     transformer.train()
     optimizer.zero_grad()
-    step = 0
     try:
+        print('Training...')
         for step, (src, tgt) in enumerate(train_dataloader, start=1):
             src = src.to(DEVICE)
             tgt = tgt.to(DEVICE)
@@ -285,7 +285,7 @@ def main(hparams):
     else:
         print(f'Checkpoint {best_model_path} does not exist!!!')
 
-    print('End')
+    print('\nEnd!\n')
 
 
 if __name__ == '__main__':
