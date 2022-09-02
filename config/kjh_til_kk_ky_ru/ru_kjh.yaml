@@ -1,6 +1,6 @@
 project_name: 'nmt'
 experiment_name: 'default_transformer'
-model_path: 'experiments/nmt/default_transformer_ru_kjh_kk_ky_ru_kjh_kk_ky/checkpoints/best.pt'
+model_path: 'experiments/nmt/default_transformer_ru_kjh_kk_ky_ru_kk/checkpoints/best.pt'
 
 data_root_comb: 'data/apply_bpe_kjh_til_kk_ky_ru/kjh_til_kk_ky_ru'
 src_language_comb: 'ru'
@@ -12,7 +12,7 @@ tgt_language: 'kjh'
 
 num_pred_examples: 3
 
-add_info: ''
+add_info: 'ru_kk'
 min_freq: 1
 batch_size: 8
 num_steps: 50000000
