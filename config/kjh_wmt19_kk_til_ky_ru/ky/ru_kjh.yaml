@@ -2,6 +2,7 @@ project_name: 'nmt_wmt19_kk_til_ky'
 experiment_name: 'default_transformer'
 model_path: 'experiments/nmt_wmt19_kk_til_ky/default_transformer_lang_comb_ru_kjh_kk_ky_lang_ru_ky/checkpoints/best.pt'
 
+vocab_dir: 'data/apply_bpe_kjh_wmt19_kk_til_ky_ru/kjh_wmt19_kk_til_ky_ru'
 data_root_comb: 'data/apply_bpe_kjh_wmt19_kk_til_ky_ru/kjh_wmt19_kk_til_ky_ru'
 src_language_comb: 'ru'
 tgt_language_comb: 'kjh_kk_ky'

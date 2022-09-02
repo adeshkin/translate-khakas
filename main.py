@@ -28,7 +28,7 @@ import numpy as np
 
 from model import Seq2SeqTransformer
 from utils import create_mask, translate
-from dataset import prepare_data, PAD_IDX
+from data.dataset import prepare_data, PAD_IDX
 
 
 def set_seed(seed):
@@ -91,6 +91,7 @@ def main(hparams):
     project_name = hparams['project_name']
     MODEL_PATH = hparams['model_path']
 
+    VOCAB_DIR = hparams['vocab_dir']
     DATA_ROOT_COMB = hparams['data_root_comb']
     SRC_LANGUAGE_COMB = hparams['src_language_comb']
     TGT_LANGUAGE_COMB = hparams['tgt_language_comb']
@@ -122,6 +123,7 @@ def main(hparams):
     train_dataloader, val_dataloader, vocab_transform, text_transform = prepare_data(DATA_ROOT_COMB,
                                                                                      (SRC_LANGUAGE_COMB,
                                                                                       TGT_LANGUAGE_COMB),
+                                                                                     VOCAB_DIR,
                                                                                      DATA_ROOT,
                                                                                      (SRC_LANGUAGE, TGT_LANGUAGE),
                                                                                      BATCH_SIZE,

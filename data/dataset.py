@@ -90,15 +90,10 @@ def tokenize_text(text):
     return text.split()
 
 
-def prepare_comb_data(data_root_comb, language_pair_comb, min_freq):
+def prepare_save_vocab(data_root_comb, language_pair_comb, min_freq, vocab_dir):
     SRC_LANGUAGE, TGT_LANGUAGE = language_pair_comb
 
-    # Place-holders
-    token_transform = {}
-    vocab_transform = {}
-
-    for ln in [SRC_LANGUAGE, TGT_LANGUAGE]:
-        token_transform[ln] = tokenize_text
+    vocab_transform = dict()
 
     # helper function to yield list of tokens
     def yield_tokens(data_iter: Iterable, language: str) -> List[str]:
@@ -122,14 +117,9 @@ def prepare_comb_data(data_root_comb, language_pair_comb, min_freq):
     for ln in [SRC_LANGUAGE, TGT_LANGUAGE]:
         vocab_transform[ln].set_default_index(UNK_IDX)
 
-    # src and tgt language text transforms to convert raw strings into tensors indices
-    text_transform = {}
+    os.makedirs(vocab_dir)
     for ln in [SRC_LANGUAGE, TGT_LANGUAGE]:
-        text_transform[ln] = sequential_transforms(token_transform[ln],  # Tokenization
-                                                   vocab_transform[ln],  # Numericalization
-                                                   tensor_transform)  # Add BOS/EOS and create tensor
-
-    return token_transform, vocab_transform, text_transform
+        torch.save(vocab_transform[ln], f'{vocab_dir}/vocab_{ln}.pth')
 
 
 def seed_worker(worker_id):
@@ -138,20 +128,34 @@ def seed_worker(worker_id):
     random.seed(worker_seed)
 
 
-def prepare_data(data_root_comb, language_pair_comb, data_root, language_pair, batch_size, min_freq, num_steps=None):
-    token_transform_comb, vocab_transform_comb, text_transform_comb = prepare_comb_data(data_root_comb,
-                                                                                        language_pair_comb,
-                                                                                        min_freq)
+def prepare_data(data_root_comb, language_pair_comb, vocab_dir, data_root, language_pair, batch_size, min_freq, num_steps=None):
+    if not os.path.exists(f'{vocab_dir}/vocab_{language_pair_comb[0]}.pth') \
+            or not os.path.exists(f'{vocab_dir}/vocab_{language_pair_comb[1]}.pth'):
+        print('Building vocab...')
+        prepare_save_vocab(data_root_comb, language_pair_comb, min_freq, vocab_dir)
+
+    vocab_transform_comb = {}
+    for ln in language_pair_comb:
+        print('Loading vocab...')
+        vocab_transform_comb[ln] = torch.load(f'{vocab_dir}/vocab_{ln}.pth')
+
     comb_ln2ln = {language_pair_comb[0]: language_pair[0],
                   language_pair_comb[1]: language_pair[1]}
 
-    token_transform = {}
     vocab_transform = {}
-    text_transform = {}
     for comb_ln, ln in comb_ln2ln.items():
-        token_transform[ln] = token_transform_comb[comb_ln]
         vocab_transform[ln] = vocab_transform_comb[comb_ln]
-        text_transform[ln] = text_transform_comb[comb_ln]
+
+    token_transform = dict()
+    for ln in language_pair:
+        token_transform[ln] = tokenize_text
+
+    # src and tgt language text transforms to convert raw strings into tensors indices
+    text_transform = {}
+    for ln in language_pair:
+        text_transform[ln] = sequential_transforms(token_transform[ln],  # Tokenization
+                                                   vocab_transform[ln],  # Numericalization
+                                                   tensor_transform)  # Add BOS/EOS and create tensor
 
     SRC_LANGUAGE, TGT_LANGUAGE = language_pair
 
