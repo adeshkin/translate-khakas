@@ -187,7 +187,12 @@ def main(hparams):
 
         if step % int(hparams['check_val_every_n_steps'] / 10) == 0:
             os.system('clear')
-            percentage = int(((step % hparams['check_val_every_n_steps']) / hparams['check_val_every_n_steps']) * 100)
+
+            if step % hparams['check_val_every_n_steps'] == 0:
+                percentage = 100
+            else:
+                percentage = int(((step % hparams['check_val_every_n_steps']) / hparams['check_val_every_n_steps']) * 100)
+
             print(f'Step: {step}, Train:', '#' * percentage, f'{percentage} %')
 
         if step % hparams['num_accumulation_steps'] == 0:
@@ -219,7 +224,9 @@ def main(hparams):
             if num_steps_no_improv == hparams['early_stop_patience']:
                 print('Early stopping...')
                 break
+
             transformer.train()
+
     # NUM_EPOCHS = hparams['num_epochs']
     # num_epochs_no_improv = 0
     # for epoch in range(1, NUM_EPOCHS + 1):
