@@ -19,7 +19,6 @@ import sys
 import yaml
 import torch
 import torch.nn as nn
-from timeit import default_timer as timer
 from tqdm import tqdm
 import wandb
 from torchtext.data.metrics import bleu_score
