@@ -35,7 +35,7 @@ betas:
 eps: 1.0e-9
 factor: 0.5
 threshold: 0.01
-patience: 5
+patience: 10
 min_lr: 1.0e-6
 
 
