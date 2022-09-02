@@ -231,8 +231,8 @@ def main(hparams):
 
                 transformer.train()
     except KeyboardInterrupt:
-        print(f"\nBest Val loss: {best_val_loss:.3f}")
         print('Manual stop...')
+        print(f"\nBest Val loss: {best_val_loss:.3f}")
 
     def calc_bleu(split='test'):
         src_filepath = f'{DATA_ROOT}/{split}.{SRC_LANGUAGE}'
