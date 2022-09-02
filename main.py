@@ -223,7 +223,7 @@ def main(hparams):
         pred_tgt_sents = []
         examples = []
         example_idxs = [random.randint(0, len(src_sents) - 1) for _ in range(hparams['num_pred_examples'])]
-        for idx, (src_sent, tgt_sent) in tqdm(enumerate(zip(src_sents, tgt_sents)), total=len(src_sents), desc='TEST'):
+        for idx, (src_sent, tgt_sent) in tqdm(enumerate(zip(src_sents, tgt_sents)), total=len(src_sents), desc='TESTING'):
             src_sent = src_sent.rstrip('\n')
             tgt_sent = tgt_sent.rstrip('\n')
             prd_sent = translate(transformer, src_sent, DEVICE, SRC_LANGUAGE, TGT_LANGUAGE, text_transform,
