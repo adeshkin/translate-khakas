@@ -187,7 +187,7 @@ def main(hparams):
 
         if step % int(hparams['check_val_every_n_steps'] / 10) == 0:
             os.system('clear')
-            percentage = int((step % hparams['check_val_every_n_steps']) * 100)
+            percentage = int(((step % hparams['check_val_every_n_steps']) / hparams['check_val_every_n_steps']) * 100)
             print(f'Step: {step}, Train:', '#' * percentage, f'{percentage} %')
 
         if step % hparams['num_accumulation_steps'] == 0:
