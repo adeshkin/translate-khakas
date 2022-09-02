@@ -185,16 +185,16 @@ def main(hparams):
         loss.backward()
         losses += loss.item()
 
-        if step % int(hparams['check_val_every_n_epoch'] / 10) == 0:
+        if step % int(hparams['check_val_every_n_steps'] / 10) == 0:
             os.system('cls')
-            percentage = int((step/hparams['check_val_every_n_epoch']) * 100)
+            percentage = int((step/hparams['check_val_every_n_steps']) * 100)
             print('#' * percentage, f'{percentage} %')
 
         if step % hparams['num_accumulation_steps'] == 0:
             optimizer.step()
             optimizer.zero_grad()
 
-        if step % hparams['check_val_every_n_epoch'] == 0:
+        if step % hparams['check_val_every_n_steps'] == 0:
             train_loss = losses / hparams['check_val_every_n_steps']
             losses = 0
 
