@@ -4,7 +4,7 @@
 # source and target padding tokens. Below, let's define a function that will take care of both.
 #
 import torch
-from dataset import PAD_IDX, EOS_IDX, BOS_IDX
+from data.dataset import PAD_IDX, EOS_IDX, BOS_IDX
 
 
 def generate_square_subsequent_mask(sz, device):
