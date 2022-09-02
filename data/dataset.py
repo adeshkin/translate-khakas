@@ -117,7 +117,7 @@ def prepare_save_vocab(data_root_comb, language_pair_comb, min_freq, vocab_dir):
     for ln in [SRC_LANGUAGE, TGT_LANGUAGE]:
         vocab_transform[ln].set_default_index(UNK_IDX)
 
-    os.makedirs(vocab_dir)
+    os.makedirs(vocab_dir, exist_ok=True)
     for ln in [SRC_LANGUAGE, TGT_LANGUAGE]:
         torch.save(vocab_transform[ln], f'{vocab_dir}/vocab_{ln}.pth')
 
