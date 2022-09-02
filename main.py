@@ -231,7 +231,7 @@ def main(hparams):
 
                 transformer.train()
     except KeyboardInterrupt:
-        print(f"Step: {step}, Best Val loss: {best_val_loss:.3f}")
+        print(f"\nStep: {step}, Best Val loss: {best_val_loss:.3f}")
         print('Manual stop...')
 
     def calc_bleu(split='test'):
