@@ -264,6 +264,7 @@ def main(hparams):
 
 if __name__ == '__main__':
     filepath = sys.argv[1]
+    print('\n\n\n', filepath)
     with open(filepath, 'r') as f:
         hparams = yaml.load(f, yaml.Loader)
     main(hparams)
