@@ -171,68 +171,68 @@ def main(hparams):
     num_steps_no_improv = 0
     transformer.train()
     optimizer.zero_grad()
+    step = 0
+    try:
+        for step, (src, tgt) in enumerate(train_dataloader, start=1):
+            src = src.to(DEVICE)
+            tgt = tgt.to(DEVICE)
 
-    for step, (src, tgt) in enumerate(train_dataloader, start=1):
-        src = src.to(DEVICE)
-        tgt = tgt.to(DEVICE)
+            tgt_input = tgt[:-1, :]
 
-        tgt_input = tgt[:-1, :]
+            src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input, DEVICE)
 
-        src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input, DEVICE)
+            logits = transformer(src, tgt_input, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask, src_padding_mask)
 
-        logits = transformer(src, tgt_input, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask, src_padding_mask)
+            tgt_out = tgt[1:, :]
+            loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
+            loss.backward()
+            losses += loss.item()
 
-        tgt_out = tgt[1:, :]
-        loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
-        loss.backward()
-        losses += loss.item()
+            if step % int(hparams['check_val_every_n_steps'] / 10) == 0:
+                os.system('clear')
 
-        if step % int(hparams['check_val_every_n_steps'] / 10) == 0:
-            os.system('clear')
+                if step % hparams['check_val_every_n_steps'] == 0:
+                    percentage = 100
+                else:
+                    percentage = int(((step % hparams['check_val_every_n_steps']) / hparams['check_val_every_n_steps']) * 100)
+
+                print(f'Step: {step}, Train:', '#' * percentage, f'{percentage} %')
+
+            if step % hparams['num_accumulation_steps'] == 0:
+                optimizer.step()
+                optimizer.zero_grad()
 
             if step % hparams['check_val_every_n_steps'] == 0:
-                percentage = 100
-            else:
-                percentage = int(((step % hparams['check_val_every_n_steps']) / hparams['check_val_every_n_steps']) * 100)
+                train_loss = losses / hparams['check_val_every_n_steps']
+                losses = 0
 
-            print(f'Step: {step}, Train:', '#' * percentage, f'{percentage} %')
-
-        if step % hparams['num_accumulation_steps'] == 0:
-            optimizer.step()
-            optimizer.zero_grad()
-
-        if step % hparams['check_val_every_n_steps'] == 0:
-            train_loss = losses / hparams['check_val_every_n_steps']
-            losses = 0
-
-            try:
                 val_loss = evaluate(transformer, val_dataloader, DEVICE, loss_fn)
-            except KeyboardInterrupt:
-                print('Manual stop...')
-                break
 
-            scheduler.step(val_loss)
+                scheduler.step(val_loss)
 
-            wandb.log({'lr': optimizer.param_groups[0]["lr"],
-                       'train_loss': train_loss,
-                       'train_ppl': math.exp(train_loss),
-                       'val_loss': val_loss,
-                       'val_ppl': math.exp(val_loss)})
-            print(f"Step: {step}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}")
+                wandb.log({'lr': optimizer.param_groups[0]["lr"],
+                           'train_loss': train_loss,
+                           'train_ppl': math.exp(train_loss),
+                           'val_loss': val_loss,
+                           'val_ppl': math.exp(val_loss)})
+                print(f"Step: {step}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}")
 
-            if val_loss < best_val_loss:
-                num_steps_no_improv = 0
-                best_val_loss = val_loss
-                print('Saving best model...')
-                torch.save(transformer.state_dict(), f"{checkpoint_dir}/best.pt")
-            else:
-                num_steps_no_improv += 1
+                if val_loss < best_val_loss:
+                    num_steps_no_improv = 0
+                    best_val_loss = val_loss
+                    print('Saving best model...')
+                    torch.save(transformer.state_dict(), f"{checkpoint_dir}/best.pt")
+                else:
+                    num_steps_no_improv += 1
 
-            if num_steps_no_improv == hparams['early_stop_patience']:
-                print('Early stopping...')
-                break
+                if num_steps_no_improv == hparams['early_stop_patience']:
+                    print('Early stopping...')
+                    break
 
-            transformer.train()
+                transformer.train()
+    except KeyboardInterrupt:
+        print(f"Step: {step}, Best Val loss: {best_val_loss:.3f}")
+        print('Manual stop...')
 
     def calc_bleu(split='test'):
         src_filepath = f'{DATA_ROOT}/{split}.{SRC_LANGUAGE}'
@@ -268,18 +268,24 @@ def main(hparams):
 
         return bleu_score(pred_tgt_sents, true_tgt_sents), examples
 
-    print('Loading best model...')
-    transformer.load_state_dict(torch.load(f'{checkpoint_dir}/best.pt'))
-    test_bleu_score, test_examples = calc_bleu()
+    best_model_path = f'{checkpoint_dir}/best.pt'
+    if os.path.exists(best_model_path):
+        print(f'Loading best model from {best_model_path}...')
+        transformer.load_state_dict(torch.load(best_model_path))
+        test_bleu_score, test_examples = calc_bleu()
 
-    test_metric_table = wandb.Table(columns=["bleu"])
-    test_metric_table.add_data(test_bleu_score)
-    wandb.log({"test_metrics": test_metric_table})
+        test_metric_table = wandb.Table(columns=["bleu"])
+        test_metric_table.add_data(test_bleu_score)
+        wandb.log({"test_metrics": test_metric_table})
 
-    prediction_table = wandb.Table(columns=["source", "target", "prediction"])
-    for example in test_examples:
-        prediction_table.add_data(example[0], example[1], example[2])
-    wandb.log({"test_translations": prediction_table})
+        prediction_table = wandb.Table(columns=["source", "target", "prediction"])
+        for example in test_examples:
+            prediction_table.add_data(example[0], example[1], example[2])
+        wandb.log({"test_translations": prediction_table})
+    else:
+        print(f'Checkpoint {best_model_path} does not exist!!!')
+
+    print('End')
 
 
 if __name__ == '__main__':
