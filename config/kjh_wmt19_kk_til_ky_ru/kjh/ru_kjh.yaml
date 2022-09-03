@@ -15,8 +15,8 @@ num_pred_examples: 3
 
 add_info: ''
 min_freq: 1
-batch_size: 24
-num_accumulation_steps: 128
+batch_size: 25
+num_accumulation_steps: 4
 train_length: 15000000
 early_stop_patience: 20
 check_val_every_n_steps: 10000
@@ -30,13 +30,14 @@ NUM_ENCODER_LAYERS: 3
 NUM_DECODER_LAYERS: 3
 MAXLEN: 525
 
+label_smoothing: 0.1
 
 lr: 0.0001
 betas:
   - 0.9
   - 0.98
 eps: 1.0e-9
-factor: 0.5
+factor: 0.7
 threshold: 0.01
 patience: 10
 min_lr: 1.0e-6

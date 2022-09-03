@@ -129,7 +129,7 @@ def main(hparams):
         print(f'Loading model from {MODEL_PATH}...')
         transformer.load_state_dict(torch.load(MODEL_PATH))
 
-    loss_fn = torch.nn.CrossEntropyLoss(ignore_index=PAD_IDX)
+    loss_fn = torch.nn.CrossEntropyLoss(ignore_index=PAD_IDX, label_smoothing=hparams['label_smoothing'])
 
     optimizer = torch.optim.Adam(transformer.parameters(), lr=hparams['lr'], betas=hparams['betas'], eps=hparams['eps'])
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,
