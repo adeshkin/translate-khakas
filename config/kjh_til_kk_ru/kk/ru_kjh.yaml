@@ -17,6 +17,7 @@ add_info: 'ru_kk'
 min_freq: 1
 batch_size: 16
 num_accumulation_steps: 16
+warmup_steps: 100000
 train_length: 15000000
 early_stop_patience: 10
 check_val_every_n_steps: 10000

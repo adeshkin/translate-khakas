@@ -176,7 +176,7 @@ def main(hparams):
                 optimizer.step()
                 optimizer.zero_grad()
 
-            if step % hparams['check_val_every_n_steps'] == 0:
+            if step % hparams['check_val_every_n_steps'] == 0 and step > hparams['warmup_steps']:
                 train_loss = losses / hparams['check_val_every_n_steps']
                 losses = 0
 
