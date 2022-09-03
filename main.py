@@ -61,7 +61,7 @@ def evaluate(model, val_dataloader, device, loss_fn):
 
 
 def main(hparams):
-    set_seed(1234567890)
+    set_seed(1234567)
     project_name = hparams['project_name']
     MODEL_PATH = hparams['model_path']
 
