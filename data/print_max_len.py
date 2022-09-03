@@ -1,8 +1,8 @@
 
 def main():
-    data_dir = 'apply_bpe_kjh_wmt19_kk_til_ky_ru/kjh_wmt19_kk_til_ky_ru'
+    data_dir = 'apply_bpe_kjh_til_kk_ru/kjh_til_kk_ru'
     max_len = 0
-    src_lang = 'kjh_kk_ky'
+    src_lang = 'kjh_kk'
     tgt_lang = 'ru'
     for split in ['train', 'val', 'test']:
         filepath = f'{data_dir}/{split}.{src_lang}'

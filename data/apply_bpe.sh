@@ -5,12 +5,12 @@ source_dir=/home/adeshkin/projects/nmt/translate-khakas1/data
 
 voc_thr=50
 
-sample='kjh_til_ky_ru'
-src_lang='kjh_ky'
+sample='kjh_til_kk_ru'
+src_lang='kjh_kk'
 tgt_lang='ru'
 
-sample1='til_ky_ru'
-src_lang1='ky'
+sample1='kjh_til_kk_ru'
+src_lang1='kjh_kk'
 tgt_lang1='ru'
 
 bpe_dir=$source_dir/learn_bpe/"$sample"
