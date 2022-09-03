@@ -5,8 +5,8 @@ source_dir=/home/adeshkin/projects/nmt/translate-khakas1/data
 
 voc_thr=50
 
-sample='kjh_wmt19_kk_til_ky_ru'
-src_lang='kjh_kk_ky'
+sample='kjh_til_ky_ru'
+src_lang='kjh_ky'
 tgt_lang='ru'
 
 sample1='til_ky_ru'
