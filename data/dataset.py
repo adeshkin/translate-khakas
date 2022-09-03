@@ -128,7 +128,7 @@ def seed_worker(worker_id):
     random.seed(worker_seed)
 
 
-def prepare_data(data_root_comb, language_pair_comb, vocab_dir, data_root, language_pair, batch_size, min_freq, num_steps=None):
+def prepare_data(data_root_comb, language_pair_comb, vocab_dir, data_root, language_pair, batch_size, min_freq, train_length=None):
     if not os.path.exists(f'{vocab_dir}/vocab_{language_pair_comb[0]}.pth') \
             or not os.path.exists(f'{vocab_dir}/vocab_{language_pair_comb[1]}.pth'):
         print('Building vocab...')
@@ -176,7 +176,7 @@ def prepare_data(data_root_comb, language_pair_comb, vocab_dir, data_root, langu
     train_iter = KjhRuDataset(data_root,
                               split='train',
                               language_pair=(SRC_LANGUAGE, TGT_LANGUAGE),
-                              length=num_steps)
+                              length=train_length)
     train_dataloader = DataLoader(train_iter, batch_size=batch_size, shuffle=True, collate_fn=collate_fn,
                                   num_workers=os.cpu_count(), worker_init_fn=seed_worker, generator=g)
 

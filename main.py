@@ -92,7 +92,7 @@ def main(hparams):
 
     MIN_FREQ = hparams['min_freq']
     BATCH_SIZE = hparams['batch_size']
-    NUM_STEPS = hparams['num_steps']
+    TRAIN_LEHGTH = hparams['train_length']
 
     train_dataloader, val_dataloader, vocab_transform, text_transform = prepare_data(DATA_ROOT_COMB,
                                                                                      (SRC_LANGUAGE_COMB,
@@ -102,7 +102,7 @@ def main(hparams):
                                                                                      (SRC_LANGUAGE, TGT_LANGUAGE),
                                                                                      BATCH_SIZE,
                                                                                      MIN_FREQ,
-                                                                                     NUM_STEPS)
+                                                                                     TRAIN_LEHGTH)
 
     DEVICE = torch.device(hparams['device'])
 
