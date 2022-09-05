@@ -5,8 +5,8 @@ source_dir=/home/adeshkin/projects/nmt/translate-khakas1/data
 
 num_operations=30000
 
-sample='kjh_til_ky_ru'
-src_lang='kjh_ky'
+sample='dict_kjh_wmt19_thr_2_kk_ru'
+src_lang='kjh_kk'
 tgt_lang='ru'
 
 tok_dir=$source_dir/tok_data/"$sample"
