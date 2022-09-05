@@ -1,6 +1,6 @@
 
 def main():
-    data_dir = 'apply_bpe_kjh_til_kk_ru/kjh_til_kk_ru'
+    data_dir = 'apply_bpe_dict_kjh_wmt19_thr_2_kk_ru/dict_kjh_wmt19_thr_2_kk_ru'
     max_len = 0
     src_lang = 'kjh_kk'
     tgt_lang = 'ru'
