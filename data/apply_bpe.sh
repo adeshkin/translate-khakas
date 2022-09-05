@@ -1,16 +1,16 @@
 #!/bin/bash
 
 
-source_dir=/home/adeshkin/projects/nmt/translate-khakas1/data
+source_dir=/home/adeshkin/projects/nmt/translate-khakas/data
 
 voc_thr=50
 
-sample='kjh_til_kk_ru'
+sample='dict_kjh_wmt19_thr_2_kk_ru'
 src_lang='kjh_kk'
 tgt_lang='ru'
 
-sample1='kjh_til_kk_ru'
-src_lang1='kjh_kk'
+sample1='dict_kjh_ru'
+src_lang1='kjh'
 tgt_lang1='ru'
 
 bpe_dir=$source_dir/learn_bpe/"$sample"
