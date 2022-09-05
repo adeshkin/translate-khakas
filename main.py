@@ -161,6 +161,8 @@ def main(hparams):
             loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
             loss.backward()
             losses += loss.item()
+            if step == hparams['warmup_steps'] - hparams['check_val_every_n_steps']:
+                losses = 0
 
             if step % int(hparams['check_val_every_n_steps'] / 10) == 0:
                 os.system('clear')
@@ -176,7 +178,7 @@ def main(hparams):
                 optimizer.step()
                 optimizer.zero_grad()
 
-            if step % hparams['check_val_every_n_steps'] == 0 and step > hparams['warmup_steps']:
+            if step % hparams['check_val_every_n_steps'] == 0 and step >= hparams['warmup_steps']:
                 train_loss = losses / hparams['check_val_every_n_steps']
                 losses = 0
 

@@ -15,10 +15,10 @@ num_pred_examples: 3
 
 add_info: ''
 min_freq: 1
-batch_size: 16
-num_accumulation_steps: 32
+batch_size: 32
+num_accumulation_steps: 8
 warmup_steps: 100000
-train_length: 10000000
+train_length: 15000000
 early_stop_patience: 10
 check_val_every_n_steps: 10000
 
