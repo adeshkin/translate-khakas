@@ -13,7 +13,7 @@ tgt_language: 'kjh'
 
 num_pred_examples: 3
 
-add_info: ''
+add_info: 'scratch'
 min_freq: 1
 batch_size: 32
 num_accumulation_steps: 8
