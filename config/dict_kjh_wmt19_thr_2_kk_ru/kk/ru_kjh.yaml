@@ -13,24 +13,23 @@ tgt_language: 'kjh'
 
 num_pred_examples: 3
 
-add_info: ''
+add_info: 'ft'
 min_freq: 1
-batch_size: 32
-num_accumulation_steps: 8
+batch_size: 8
+num_accumulation_steps: 32
 warmup_steps: 100000
-train_length: 15000000
-early_stop_patience: 30
+train_length: 30000000
+early_stop_patience: 40
 check_val_every_n_steps: 10000
 
 device: 'cuda:1'
 
-EMB_SIZE: 256
+EMB_SIZE: 512
 NHEAD: 8
-FFN_HID_DIM: 256
+FFN_HID_DIM: 512
 NUM_ENCODER_LAYERS: 3
 NUM_DECODER_LAYERS: 3
 MAXLEN: 350
-
 
 label_smoothing: 0.1
 
@@ -41,7 +40,7 @@ betas:
 eps: 1.0e-9
 factor: 0.7
 threshold: 0.01
-patience: 15
+patience: 10
 min_lr: 1.0e-6
 
 
