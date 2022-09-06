@@ -15,8 +15,8 @@ num_pred_examples: 3
 
 add_info: 'ft'
 min_freq: 1
-batch_size: 8
-num_accumulation_steps: 32
+batch_size: 24
+num_accumulation_steps: 16
 warmup_steps: 100000
 train_length: 30000000
 early_stop_patience: 40
