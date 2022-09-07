@@ -15,12 +15,12 @@ num_pred_examples: 3
 
 add_info: 'ft'
 min_freq: 1
-batch_size: 32
-num_accumulation_steps: 32
-warmup_steps: 100000
+batch_size: 64
+num_accumulation_steps: 64
+warmup_steps: 10000
 train_length: 30000000
 early_stop_patience: 40
-check_val_every_n_steps: 10000
+check_val_every_n_steps: 1000
 
 device: 'cuda:1'
 
@@ -33,7 +33,7 @@ MAXLEN: 350
 
 label_smoothing: 0.1
 
-lr: 0.0001
+lr: 0.00005
 betas:
   - 0.9
   - 0.98
