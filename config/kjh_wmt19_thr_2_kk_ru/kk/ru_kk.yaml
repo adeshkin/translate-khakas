@@ -1,4 +1,4 @@
-project_name: 'nmt_wmt19_thr_2_kk'
+project_name: 'nmt_kjh_wmt19_thr_2_kk'
 experiment_name: 'default_transformer'
 model_path: null
 
