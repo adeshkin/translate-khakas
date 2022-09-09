@@ -5,7 +5,7 @@ source_dir=/home/adeshkin/projects/nmt/translate-khakas/data
 
 num_operations=10000
 
-sample='dict_kjh_wmt19_thr_2_kk_ru'
+sample='kjh_wmt19_thr_2_kk_ru'
 src_lang='kjh_kk'
 tgt_lang='ru'
 

@@ -1,0 +1,45 @@
+project_name: 'nmt_wmt19_thr_2_kk'
+experiment_name: 'default_transformer'
+model_path: null
+
+vocab_dir: 'data/apply_bpe_kjh_wmt19_thr_2_kk_ru'
+data_root_comb: 'data/apply_bpe_kjh_wmt19_thr_2_kk_ru/kjh_wmt19_thr_2_kk_ru'
+src_language_comb: 'ru'
+tgt_language_comb: 'kjh_kk'
+
+data_root: 'data/apply_bpe_kjh_wmt19_thr_2_kk_ru/kjh_ru'
+src_language: 'ru'
+tgt_language: 'kjh'
+
+num_pred_examples: 3
+
+add_info: ''
+min_freq: 1
+batch_size: 64
+num_accumulation_steps: 64
+warmup_steps: 10000
+train_length: 30000000
+early_stop_patience: 40
+check_val_every_n_steps: 1000
+
+device: 'cuda:1'
+
+EMB_SIZE: 512
+NHEAD: 8
+FFN_HID_DIM: 512
+NUM_ENCODER_LAYERS: 3
+NUM_DECODER_LAYERS: 3
+MAXLEN: 350
+
+label_smoothing: 0.1
+
+lr: 0.00005
+betas:
+  - 0.9
+  - 0.98
+eps: 1.0e-9
+factor: 0.7
+threshold: 0.01
+patience: 10
+min_lr: 1.0e-6
+

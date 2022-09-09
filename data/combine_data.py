@@ -30,7 +30,7 @@ def write_pairs(pairs, save_dir, src_lang, tgt_lang, split):
 def combine_data():
     random.seed(42)
 
-    sample_dir1 = 'tok_data/dict_kjh_ru'
+    sample_dir1 = 'tok_data/kjh_ru'
     src_lang1 = 'kjh'
     tgt_lang1 = 'ru'
 
@@ -38,7 +38,7 @@ def combine_data():
     src_lang2 = 'kk'
     tgt_lang2 = 'ru'
 
-    save_dir = 'tok_data/dict_kjh_wmt19_thr_2_kk_ru'
+    save_dir = 'tok_data/kjh_wmt19_thr_2_kk_ru'
     src_lang = 'kjh_kk'
     tgt_lang = 'ru'
 
