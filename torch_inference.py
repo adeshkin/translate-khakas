@@ -1,7 +1,7 @@
 import torch
 from nltk.tokenize import WordPunctTokenizer
 
-from custom_bpe import init_bpe
+from inference.custom_bpe import init_bpe
 from data.dataset import tensor_transform, sequential_transforms, tokenize_text
 from model import Seq2SeqTransformer
 from utils import translate
@@ -12,7 +12,7 @@ def main():
     voc_dir = 'data/apply_bpe_dict_kjh_wmt19_thr_2_kk_ru'
     model_path = 'experiments/nmt_wmt19_thr_2_kk/default_transformer_lang_comb_ru_kjh_kk_lang_ru_kjh_ft/checkpoints/best.pt'
     vocabulary_threshold = 50
-    DEVICE = torch.device('cpu')
+    DEVICE = torch.device('cuda:0')
     SRC_LANGUAGE = 'ru'
     TGT_LANGUAGE = 'kjh'
     EMB_SIZE = 512
