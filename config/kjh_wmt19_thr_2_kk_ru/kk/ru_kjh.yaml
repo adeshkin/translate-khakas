@@ -1,6 +1,6 @@
 project_name: 'nmt_kjh_wmt19_thr_2_kk'
 experiment_name: 'default_transformer'
-model_path: 'experiments/nmt_wmt19_thr_2_kk/default_transformer_lang_comb_ru_kjh_kk_lang_ru_kk/checkpoints/best.pt'
+model_path: 'experiments/nmt_kjh_wmt19_thr_2_kk/default_transformer_lang_comb_ru_kjh_kk_lang_ru_kk/checkpoints/best.pt'
 
 vocab_dir: 'data/apply_bpe_kjh_wmt19_thr_2_kk_ru'
 data_root_comb: 'data/apply_bpe_kjh_wmt19_thr_2_kk_ru/kjh_wmt19_thr_2_kk_ru'
